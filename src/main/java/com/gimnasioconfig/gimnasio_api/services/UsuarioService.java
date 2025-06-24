@@ -7,6 +7,7 @@ import java.util.UUID;
 import com.fasterxml.jackson.databind.ser.std.UUIDSerializer;
 import com.gimnasioconfig.gimnasio_api.models.Usuario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.gimnasioconfig.gimnasio_api.repositories.UsuarioRepository;
@@ -16,6 +17,9 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepo;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Usuario> all(){
         return usuarioRepo.findAll();
@@ -38,8 +42,9 @@ public class UsuarioService {
         return usuarioRepo.findByUsername(username);
     }
 
-    public Usuario save(Usuario clase){
-        return (Usuario) usuarioRepo.save(clase);
+    public Usuario save(Usuario usuario){
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        return (Usuario) usuarioRepo.save(usuario);
     }
 
     public void delete(Long id){
@@ -64,7 +69,7 @@ public class UsuarioService {
         }
 
         existing.setUsername(usuarioData.getUsername());
-        existing.setPassword(usuarioData.getPassword());
+        existing.setPassword(passwordEncoder.encode(usuarioData.getPassword()));
         existing.setRol(usuarioData.getRol());
         existing.setActivo(usuarioData.getActivo());
 
